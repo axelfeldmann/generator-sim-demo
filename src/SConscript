@@ -1,0 +1,17 @@
+Import("env")
+from pathlib import Path    
+
+# Get a list of all .cpp files
+all_files = Glob("*.cpp")
+
+# List of main files
+main_file_names = ["singlegen.cpp", "interleaving.cpp", "statemachine.cpp", "mixed.cpp"]
+
+common_files = [ f for f in all_files if f.name not in main_files_names ]
+main_files = [ f for f in all_files if f.name in main_file_names ]
+
+# Creating separate Programs with their respective main file and the common files
+for main_file in main_files:
+    program_name = main_file.name[:-4]  # remove .cpp extension for the program name
+    files_to_build = [main_file] + [common_files]
+    env.Program(program_name, files_to_build)
