@@ -96,6 +96,16 @@ write a whole new state machine. Also, if we wanted to implement
 a more complicated algorithm, converting it to a state
 machine would be a pain.
 
+## Another bad solution
+
+Instead of doing this, we could just run through the entire
+program when we construct the `Gemm` object and store
+all the `Instruction`s in a vector. The problem with this
+approach is that some programs may execute billions of
+instructions and storing all of them would be impractical.
+We need an approach that generates instructions
+on the fly.
+
 ## C++ Generators
 
 Instead, we can turn to the implementation shown in
