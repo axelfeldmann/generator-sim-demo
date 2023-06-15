@@ -7,7 +7,7 @@ all_files = Glob("*.cpp")
 # List of main files
 main_file_names = ["singlegen.cpp", "interleaving.cpp", "statemachine.cpp", "mixed.cpp"]
 
-common_files = [ f for f in all_files if f.name not in main_files_names ]
+common_files = [ f for f in all_files if f.name not in main_file_names ]
 main_files = [ f for f in all_files if f.name in main_file_names ]
 
 # Creating separate Programs with their respective main file and the common files

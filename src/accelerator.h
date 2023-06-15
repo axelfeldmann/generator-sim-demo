@@ -19,6 +19,8 @@ public:
     void schedule(Instruction* instr);
     void next_cycle();
     uint64_t cur_cycle = 0;
+
+    ~Accelerator();
 private:
     queue<Instruction*> fifo;
     const uint32_t FIFO_CAPACITY = 8;
@@ -29,4 +31,5 @@ private:
     uint64_t done_cycle;
 
     Cache* cache;
+    queue<StoreAccumulator*> store_queue;
 };

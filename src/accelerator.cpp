@@ -12,7 +12,7 @@ bool Accelerator::can_schedule() const {
 }
 
 bool Accelerator::idle() const {
-    return fifo.empty() && (executing == nullptr);
+    return fifo.empty() && (executing == nullptr) && (store_queue.empty());
 }
 
 void Accelerator::schedule(Instruction* instr) {
@@ -43,17 +43,28 @@ void Accelerator::next_cycle() {
 
     cache->next_cycle();
 
+    // We are executing an instruction, let's see if it's done this cycle
     if (executing != nullptr) {
         if (cur_cycle == done_cycle) {
 
+            // StoreAccumulator instructions have a writeback mechanism
             if (auto store = dynamic_cast<StoreAccumulator*>(executing)) {
                 cache->store(&store->dest);
-            }
 
+                // We need to wait for the store to complete before
+                // deleting the store instruction
+                store_queue.push(store);
+
+            } else {
+
+                // We're done with all other instrucitons forever
+                delete executing;
+            }
             executing = nullptr;
         }
     }
 
+    // If we're not executing anything, let's see if we can issue the next instr
     if (executing == nullptr && !fifo.empty() && fifo.front()->ready()) {
         auto* instr = fifo.front();
         fifo.pop();
@@ -63,4 +74,15 @@ void Accelerator::next_cycle() {
 
         printf("[%lu] Issued instr: %s\n", cur_cycle, instr->to_string().c_str());
     }
+
+    // Handle the store queue to avoid memory leaks
+    while (!store_queue.empty() && store_queue.front()->dest.done) {
+        delete store_queue.front();
+        store_queue.pop();
+    }
+}
+
+Accelerator::~Accelerator() {
+    assert(idle());
+    delete cache;
 }

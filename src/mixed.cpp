@@ -42,9 +42,10 @@ int main(int argc, char* argv[]) {
             // back of the line (to achieve round robin behavior)
             if (*gen) {
                 gens.push_back(gen);
+            } else {
+                delete gen;
             }
         }
-
         accel.next_cycle();
     }
     
